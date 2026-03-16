@@ -11,7 +11,7 @@ import { setUserData } from '../redux/userSlice';
 function Auth() {
     const dispatch = useDispatch()
 
-    const serverUrl = "https://intellinoteserver.onrender.com/";
+    const serverUrl = "https://intellinoteserver.onrender.com";
 
     const handleGoogleAuth = async () => {
         // Google authentication logic 
