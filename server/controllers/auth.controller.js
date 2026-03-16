@@ -14,6 +14,7 @@ export const googleAuth = async (req,res) => {
         httpOnly : true,
         secure : true, // Set to true in production with HTTPS
         sameSite : 'none',
+        path: "/",
         maxAge : 30*24*60*60*1000 // 30 days
     })
     return res.status(200).json(user)
