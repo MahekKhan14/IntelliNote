@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Auth from './pages/Auth.jsx';
-export const serverUrl = "http://localhost:8000";
+export const serverUrl = "https://intellinoteserver.onrender.com";
 import { getCurrentUser } from './services/api.js';
 import { useDispatch, useSelector } from 'react-redux';
 import Notes from './pages/Notes.jsx';
