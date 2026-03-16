@@ -9,9 +9,9 @@ The project includes authentication, a credit-based usage system, and payment in
 ## Live Demo
 
 Frontend (User Interface):
-https://your-frontend-link.vercel.app
+https://intellinoteclient.onrender.com
 
-Backend API:
+Backend :
 https://intellinoteserver.onrender.com
 
 ---
