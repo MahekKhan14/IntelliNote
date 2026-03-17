@@ -27,6 +27,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+app.set("trust proxy", 1); // ✅ REQUIRED for Render + secure cookies
 
 const PORT = process.env.PORT || 8000;
 
