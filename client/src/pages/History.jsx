@@ -39,20 +39,22 @@ function History() {
         myNotes();
     }, []);
 
-    const openNotes = async (noteId) => {
-        setLoading(true)
-        setActiveNoteId(noteId)
-        try {
-            const res = await axios.get(serverUrl + `/api/notes/${noteId}`, { withCredentials: true })
-            setSelectedNote(res.data.content)
-            setLoading(false)
-        } catch (error) {
-            console.log(error)
-            setLoading(false)
+   const openNotes = async (noteId) => {
+    setLoading(true)
+    setActiveNoteId(noteId)
+    try {
+        const res = await axios.get(serverUrl + `/api/notes/${noteId}`, { withCredentials: true })
 
-        }
+        console.log(res.data); // optional debug
+
+        setSelectedNote(res.data.data) // ✅ FIXED HERE
+
+        setLoading(false)
+    } catch (error) {
+        console.log(error)
+        setLoading(false)
     }
-
+}
     useEffect(() => {
         if (window.innerWidth >= 1024) {
             setIsSidebarOpen(true);
