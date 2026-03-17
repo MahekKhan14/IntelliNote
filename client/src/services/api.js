@@ -23,16 +23,21 @@ export const getCurrentUser = async (dispatch) => {
 // ✅ Generate notes API call
 export const generateNotes = async (payload, dispatch) => {
     try {
+        const token = localStorage.getItem("token"); // ✅ ADD THIS
+
         const result = await axios.post(
             serverUrl + "/api/notes/generate-notes",
             payload,
-            { withCredentials: true }
+            {
+                withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${token}` // ✅ ADD THIS
+                }
+            }
         );
 
-        // Backend returns: { data, noteId, creditsLeft }
         const responseData = result.data;
 
-        // ✅ Update Redux store with new credits if available
         if (dispatch && responseData.creditsLeft !== undefined) {
             dispatch(setUserData({ credits: responseData.creditsLeft }));
         }
@@ -41,7 +46,7 @@ export const generateNotes = async (payload, dispatch) => {
 
     } catch (error) {
         console.error("Generate Notes Error:", error.response?.data || error.message);
-        throw error; // important so frontend can handle it
+        throw error;
     }
 };
 
