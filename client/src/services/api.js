@@ -2,7 +2,7 @@
 import axios from "axios";
 import { setUserData, clearUserData } from "../redux/userSlice";
 
-const serverUrl = "http://localhost:8000";
+const serverUrl = "https://intellinoteserver.onrender.com";
 
 // ✅ Current user fetch
 export const getCurrentUser = async (dispatch) => {

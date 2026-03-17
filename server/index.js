@@ -27,7 +27,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.set("trust proxy", 1);
+
+app.set("trust proxy", 1); // ✅ ONLY ONCE
 
 const PORT = process.env.PORT || 8000;
 
@@ -39,7 +40,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/notes", notesRouter);
 app.use("/api/pdf", pdfRouter);
-app.use("/api/credit", creditRouter)
+app.use("/api/credit", creditRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
