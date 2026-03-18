@@ -8,7 +8,8 @@ const serverUrl = "https://intellinoteserver.onrender.com";
 export const getCurrentUser = async (dispatch) => {
     try {
         const result = await axios.get(serverUrl + "/api/user/currentUser", {
-            withCredentials: true
+            withCredentials: true,
+            timeout: 15000
         });
         dispatch(setUserData(result.data));
     } catch (error) {
