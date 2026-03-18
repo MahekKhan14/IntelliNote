@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../utils/firebase";
 import axios from 'axios';
 import { serverUrl } from '../App';
@@ -13,17 +13,21 @@ function Auth() {
 
     const handleGoogleAuth = async () => {
         try {
+            // ✅ Mobile pe redirect, desktop pe popup
+            const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                await signInWithRedirect(auth, provider);
+                return; // ✅ redirect hoga, baaki code nahi chalega
+            }
+
             const response = await signInWithPopup(auth, provider);
             const User = response.user;
             const name = User.displayName;
             const email = User.email;
             const result = await axios.post(serverUrl + "/api/auth/google", { name, email }, { withCredentials: true });
-            
-            // ✅ Save token to localStorage
             if(result.data.token){
                 localStorage.setItem("token", result.data.token)
             }
-            // ✅ Save user data to Redux
             dispatch(setUserData(result.data.user))
 
         } catch (error) {
