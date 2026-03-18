@@ -36,6 +36,7 @@ export const generateNotes = async (payload, dispatch) => {
             payload,
             {
                 withCredentials: true,
+                timeout: 120000, 
                 headers: {
                     Authorization: `Bearer ${token}` // ✅ ADD THIS
                 }
