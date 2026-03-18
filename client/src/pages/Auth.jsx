@@ -4,26 +4,30 @@ import { FcGoogle } from 'react-icons/fc';
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, provider } from "../utils/firebase";
 import axios from 'axios';
-import { serverUrl } from '../App';
+import { serverUrl } from '../App'; // ✅ keep only this, remove local declaration
 import { useDispatch } from 'react-redux';
-import { setUserData } from '../redux/userSlice';
+import { setUserData } from '../redux/userSlice.js';
 
 function Auth() {
     const dispatch = useDispatch()
-
-    const serverUrl = "https://intellinoteserver.onrender.com";
+    // ✅ REMOVED duplicate local serverUrl declaration
 
     const handleGoogleAuth = async () => {
-        // Google authentication logic 
         try {
             const response = await signInWithPopup(auth, provider);
             const User = response.user;
             const name = User.displayName;
             const email = User.email;
             const result = await axios.post(serverUrl + "/api/auth/google", { name, email }, { withCredentials: true });
-            dispatch(setUserData(result.data))
+            
+            // ✅ Save token to localStorage so isAuth middleware can read it
+            if(result.data.token){
+                localStorage.setItem("token", result.data.token)
+            }
+            
+            // ✅ Save user data to Redux
+            dispatch(setUserData(result.data.user))
 
-            // Implement Google Sign-In logic here
         } catch (error) {
             console.log("Google authentication failed:", error);
         }
