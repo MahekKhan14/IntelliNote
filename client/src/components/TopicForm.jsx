@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useDispatch } from 'react-redux'; // ✅ import dispatch hook
-import { generateNotes } from '../services/api';
+import { generateNotes } from '../services/api.js';
 import { useEffect } from 'react';
-import { updateCredits } from '../redux/userSlice';
+import { updateCredits } from '../redux/userSlice.js';
 
 // ✅ Toggle moved outside TopicForm (was after return - bad practice)
 function Toggle({ label, checked, onChange }) {
@@ -66,7 +66,7 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
             });
 
             console.log("Generated Notes:", result);
-            setResult(result);         // ✅ NOT result.data (api.js already returns data directly)
+            setResult(result.data);    // ✅ actual notes object from parsedResponse
             setLoading(false);
             setClassLevel("");
             setTopic("");
