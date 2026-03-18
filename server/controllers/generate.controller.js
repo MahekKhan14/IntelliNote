@@ -73,10 +73,10 @@ export const generateNotes = async (req, res) => {
         await user.save();
         // Final response bhejenge
         return res.status(200).json({
-            data: aiResponse,        // ✅ already parsed object, direct bhejenge
-            noteId: notes._id,       // Saved note ID
-            creditsLeft: user.credits // Remaining credits
-        });
+    data: typeof aiResponse === "string" ? JSON.parse(aiResponse) : aiResponse,
+    noteId: notes._id,       // Saved note ID
+    creditsLeft: user.credits // Remaining credits
+});
     } catch (error) {
         console.log(error);
         res.status(500).json({
