@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { serverUrl } from '../App';
-import { setUserData } from '../redux/userSlice';
+import { setUserData, clearUserData } from '../redux/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -19,14 +19,19 @@ function Navbar() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const handleSignOut = async () => {
-        try {
-            await axios.get(serverUrl+"/api/auth/logout" , {withCredentials:true})
-            dispatch(setUserData(null))
-            navigate("/auth")
-        } catch(error){
-            console.log(error)
-        }
+    try {
+        await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
+        localStorage.removeItem("token") // ✅ clear JWT token
+        dispatch(clearUserData())
+        navigate("/auth")
+    } catch (error) {
+        console.log(error)
+        // ✅ Even if backend fails, still clear frontend state
+        localStorage.removeItem("token")
+        dispatch(clearUserData())
+        navigate("/auth")
     }
+}
     return (
         <motion.div
         initial = {{ opacity:0, y:-60}}
@@ -132,7 +137,7 @@ function MenuItem ({onClick , text , red}){
     return(
         <div onClick={onClick}
         className={`w-full text-left px-5 py-3 text-sm
-        transition-colors rounded-lg'
+        transition-colors rounded-lg
         ${red
             ? "text-red-400 hover:bg-red-500/10"
             : "text-gray-200 hover:bg-white/10"}`}>

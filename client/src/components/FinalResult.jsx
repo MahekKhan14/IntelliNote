@@ -63,15 +63,15 @@ function FinalResult({ result }) {
                                 ? "bg-green-600 text-white"
                                 : "bg-green-100 text-green-700 hover:bg-green-200"
                             }`}> {quickRevision ? "Exit Revision Mode" : "Quick Revision (5 min)"} </button >
-                    <button onClick={()=>downloadPdf(result)}
-                    className='px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700'>
+                    <button onClick={() => downloadPdf(result)}
+                        className='px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700'>
                         ⬇️ Download PDF
                     </button>
                 </div>
             </div>
 
             {!quickRevision && <section>
-                <SectionHeader icon="📌" title="Sub Topics" color="indigo"/>
+                <SectionHeader icon="📌" title="Sub Topics" color="indigo" />
                 {
                     Object.entries(result.subTopics).map(([star, topics]) => (
                         <div key={star} className='mb-3'>
@@ -88,9 +88,8 @@ function FinalResult({ result }) {
                 }
             </section>}
 
-
             {!quickRevision && <section>
-                <SectionHeader  icon="📚" title="Comprehensive Notes" color="purple"/>
+                <SectionHeader icon="📚" title="Comprehensive Notes" color="purple" />
                 <div className='bg-white border border-gray-200 rounded-xl p-6'>
                     <ReactMarkdown components={markDownComponent}>
                         {result.notes}
@@ -99,74 +98,68 @@ function FinalResult({ result }) {
             </section>}
 
             {quickRevision && <section className='rounded-xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200 p-6'>
+                {/* ✅ Fixed - h3 and ul separated, ul was incorrectly inside h3 */}
                 <h3 className='font-bold text-green-700 mb-3 text-lg'>
                     🔥 Quick Revision Points
-                    <ul className='list-disc ml-6 space-y-1 text-gray-800'>
-                        {result.revisionPoints.map((p,i)=>(
-                            <li key={i}>{p}</li>
-                        ))}
-
-                    </ul>
                 </h3>
-                </section>}
+                <ul className='list-disc ml-6 space-y-1 text-gray-800'>
+                    {result.revisionPoints.map((p, i) => (
+                        <li key={i}>{p}</li>
+                    ))}
+                </ul>
+            </section>}
 
-                {result.diagram?.data && <section>
-                <SectionHeader  icon="📊" title="Diagram" color="cyan"/>
-                <MermaidSetup diagram={result.diagram?.data}/>
+            {result.diagram?.data && <section>
+                <SectionHeader icon="📊" title="Diagram" color="cyan" />
+                <MermaidSetup diagram={result.diagram?.data} />
                 <p className='mt-3 text-xs text-gray-500 italic'>
                     💠Tip: Take a screenshot to save this diagram for future reference.
                 </p>
+            </section>}
 
-                </section>}
-
-                {result.charts?.length>0 &&
+            {result.charts?.length > 0 &&
                 <section>
-                <SectionHeader  icon="📈" title="Visual Charts" color="indigo"/>
-                <RechartSetup charts={result.charts}/>
-                <p className='mt-3 text-xs text-gray-500 italic'>
-                    💠Tip: Take a screenshot to save this diagram for future reference.
-                </p>
-                    
-                </section>}
-
-                {!result.charts && result.charts.length === 0 && (
-                    <p className="text-sm text-gray-400 italic">
-                        📈Charts are not relevant for this topic.
+                    <SectionHeader icon="📈" title="Visual Charts" color="indigo" />
+                    <RechartSetup charts={result.charts} />
+                    <p className='mt-3 text-xs text-gray-500 italic'>
+                        💠Tip: Take a screenshot to save this diagram for future reference.
                     </p>
+                </section>}
 
-                )}
+            {/* ✅ Fixed - was (!result.charts && ...) which crashes if charts is undefined */}
+            {(!result.charts || result.charts.length === 0) && (
+                <p className="text-sm text-gray-400 italic">
+                    📈 Charts are not relevant for this topic.
+                </p>
+            )}
 
+            <section>
+                <SectionHeader icon="❓" title="Important Questions" color="rose" />
+                <p className='font-medium'>Short Questions:</p>
+                <ul className='list-disc ml-6 text-gray-700'>
+                    {result.questions.short.map((q, i) => (
+                        <li key={i}>{q}</li>
+                    ))}
+                </ul>
 
-                <section>
-                    <SectionHeader  icon="❓" title="Important Questions" color="rose"/>
-                    <p className='font-medium'>Short Questions:</p>
-                    <ul className='list-disc ml-6 text-gray-700'>
-                        {result.questions.short.map((q,i)=>(
-                            <li key={i}>{q}</li>
-                        ))}
-                    </ul>
+                <p className='font-medium mt-4'>Long Questions:</p>
+                <ul className='list-disc ml-6 text-gray-700'>
+                    {result.questions.long.map((q, i) => (
+                        <li key={i}>{q}</li>
+                    ))}
+                </ul>
 
-                    <p className='font-medium mt-4'>Long Questions:</p>
-                    <ul className='list-disc ml-6 text-gray-700'>
-                        {result.questions.long.map((q,i)=>(
-                            <li key={i}>{q}</li>
-                        ))}
-                    </ul>
-
-                    <p className='font-medium mt-4'>Diagram Questions:</p>
-                    <ul className='list-disc ml-6 text-gray-700'>
-                        <li>{result.questions.diagram}</li>
-                    </ul>
-
-                </section>
+                <p className='font-medium mt-4'>Diagram Questions:</p>
+                <ul className='list-disc ml-6 text-gray-700'>
+                    <li>{result.questions.diagram}</li>
+                </ul>
+            </section>
 
         </div>
-
     )
 }
 
 function SectionHeader({ icon, title, color }) {
-
     const colors = {
         indigo: "from-indigo-100 to-indigo-50 text-indigo-700",
         purple: "from-purple-100 to-purple-50 text-purple-700",
@@ -186,4 +179,5 @@ function SectionHeader({ icon, title, color }) {
         </div>
     );
 }
+
 export default FinalResult;

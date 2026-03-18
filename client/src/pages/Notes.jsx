@@ -19,7 +19,7 @@ function Notes() {
     const [error, setError] = useState("")
 
     return (
-        <div className='min-h-screen bg-gradient-to-br from gray-100 to-gray-200 px-6 py-8'>
+        <div className='min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-8'>
             <motion.header // Header Start
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}

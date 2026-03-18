@@ -8,12 +8,17 @@ const serverUrl = "https://intellinoteserver.onrender.com";
 export const getCurrentUser = async (dispatch) => {
     try {
         const result = await axios.get(serverUrl + "/api/user/currentUser", {
-            withCredentials: true
+            withCredentials: true,
+            timeout: 15000 // ✅
         });
         dispatch(setUserData(result.data));
     } catch (error) {
         if (error.response?.status === 401) {
             dispatch(clearUserData());
+            return;
+        }
+        if (error.code === "ECONNABORTED") { // ✅ ADD THIS
+            console.error("Server is waking up, please try again in a moment.");
             return;
         }
         console.error("Error fetching current user:", error);

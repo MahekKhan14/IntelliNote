@@ -7,6 +7,33 @@ import { generateNotes } from '../services/api';
 import { useEffect } from 'react';
 import { updateCredits } from '../redux/userSlice';
 
+// ✅ Toggle moved outside TopicForm (was after return - bad practice)
+function Toggle({ label, checked, onChange }) {
+    return (
+        <div onClick={onChange}
+            className='flex items-center gap-4 cursor-pointer select-none'>
+            <motion.div
+                animate={{
+                    backgroundColor: checked ? "rgba(34,197,94,0.35)" //green when On
+                        : "rgba(255,255,255,0.15)" //gray when Off 
+                }}
+                transition={{ duration: 0.25 }}
+                className='relative w-12 h-6 rounded-full border border-white/20 backdrop-blur-lg'>
+
+                {/*Circle*/}
+                <motion.div
+                    layout
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className='absolute inset-y-0 my-auto h-5 w-5 rounded-full bg-white
+            shadow-[0_5px_15px_rgba(0,0,0,0.5)]'
+                    style={{ left: checked ? "1.6rem" : "0.25rem" }}>
+                </motion.div>
+            </motion.div>
+            <span className={`text-sm transition-colors ${checked ? "text-green-300" : "text-gray-300"}`}>{label}</span>
+        </div>
+    )
+}
+
 function TopicForm({ setResult, setLoading, loading, setError }) {
     const [topic, setTopic] = useState("");
     const [classLevel, setClassLevel] = useState("");
@@ -29,30 +56,30 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
         setResult(null);
 
         try {
-            const result = await generateNotes(
-                {
-                    topic,
-                    classLevel,
-                    examType,
-                    revisionMode,
-                    includeDiagram,
-                    includeChart})
-                    console.log("Generated Notes:", result)
-                    setResult(result.data)
-                    setLoading(false)
-                    setClassLevel("")
-                    setTopic("")
-                    setExamType("")
-                    setIncludeChart(false)
-                    setRevisionMode(false)
-                    setIncludeDiagram(false)
+            const result = await generateNotes({
+                topic,
+                classLevel,
+                examType,
+                revisionMode,
+                includeDiagram,
+                includeChart
+            });
 
-                    if(typeof result.creditsLeft === "number"){
-                        dispatch(updateCredits(result.creditsLeft))
-                    }
-                    
-            
-            } catch (error) {
+            console.log("Generated Notes:", result);
+            setResult(result);         // ✅ NOT result.data (api.js already returns data directly)
+            setLoading(false);
+            setClassLevel("");
+            setTopic("");
+            setExamType("");
+            setIncludeChart(false);
+            setRevisionMode(false);
+            setIncludeDiagram(false);
+
+            if (typeof result.creditsLeft === "number") {
+                dispatch(updateCredits(result.creditsLeft));
+            }
+
+        } catch (error) {
             console.log(error);
             setError("Failed to fetch notes from server");
             setLoading(false);
@@ -151,60 +178,31 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
             >{loading ? "Generating Notes...." : "Generate Notes"}
             </motion.button>
 
-{/*Progress Bar*/}
-            {loading && 
-            <div className='mt-4 space-y-2'>
-            <div className='w-full h-2 rounded-full bg-white/10 overflow-hidden'>
-            <motion.div
-            initial={{width:0}}
-            animate={{width:`${progress}%`}}
-            transition={{ease : "easeOut", duration: 0.6}}
-            className='h-full bg-gradient-to-r from-green-400 via-emerald-400 to-green-500'>
+            {/*Progress Bar*/}
+            {loading &&
+                <div className='mt-4 space-y-2'>
+                    <div className='w-full h-2 rounded-full bg-white/10 overflow-hidden'>
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ ease: "easeOut", duration: 0.6 }}
+                            className='h-full bg-gradient-to-r from-green-400 via-emerald-400 to-green-500'>
+                        </motion.div>
+                    </div>
 
-            </motion.div>
-            </div>
+                    <div className='flex justify-between text-xs text-gray-300'>
+                        <span>{progressText}</span>
+                        <span>{progress}%</span>
+                    </div>
+                    <p className='text-xs text-gray-400 text-center'>
+                        This may take up to 2-5 minutes. Please don't close or refresh the page.
+                    </p>
 
-            <div className='flex justify-between text-xs text-gray-300'>
-                <span>{progressText}</span>
-                <span>{progress}%</span>
-            </div>
-            <p className='text-xs text-gray-400 text-center'>
-                This may take up to 2-5 minutes. Please don't close or refresh the page.
-            </p>
-
-            <div></div>
-
-            </div>}
+                    <div></div>
+                </div>}
 
         </motion.div>
     )
-
-    {/* Component for Value */ }
-    function Toggle({ label, checked, onChange }) {
-        return (
-            <div onClick={onChange}
-                className='flex items-center gap-4 cursor-pointer select-none'>
-                <motion.div
-                    animate={{
-                        backgroundColor: checked ? "rgba(34,197,94,0.35)" //green when On
-                            : "rgba(255,255,255,0.15)" //gray when Off 
-                    }}
-                    transition={{ duration: 0.25 }}
-                    className='relative w-12 h-6 rounded-full border border-white/20 backdrop-blur-lg'>
-
-                    {/*Circle*/}
-                    <motion.div
-                        layout
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        className='absolute inset-y-0 my-auto h-5 w-5 rounded-full bg-white
-                shadow-[0_5px_15px_rgba(0,0,0,0.5)]'
-                        style={{ left: checked ? "1.6rem" : "0.25rem" }}>
-                    </motion.div>
-                </motion.div>
-                <span className={`text-sm transition-colors ${checked ? "text-green-300" : "text-gray-300"}`}>{label}</span>
-            </div>
-        )
-    }
 }
 
 export default TopicForm
