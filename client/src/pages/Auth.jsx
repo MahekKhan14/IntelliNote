@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { auth, provider } from "../utils/firebase";
 import axios from 'axios';
 import { serverUrl } from '../App'; // ✅ keep only this, remove local declaration
@@ -10,21 +10,50 @@ import { setUserData } from '../redux/userSlice.js';
 
 function Auth() {
     const dispatch = useDispatch()
-    // ✅ REMOVED duplicate local serverUrl declaration
+
+    // ✅ Handle redirect result when user comes back from Google on mobile
+    useEffect(() => {
+        const handleRedirectResult = async () => {
+            try {
+                const response = await getRedirectResult(auth);
+                if (response) {
+                    const User = response.user;
+                    const name = User.displayName;
+                    const email = User.email;
+                    const result = await axios.post(serverUrl + "/api/auth/google", { name, email }, { withCredentials: true });
+                    if (result.data.token) {
+                        localStorage.setItem("token", result.data.token)
+                    }
+                    dispatch(setUserData(result.data.user))
+                }
+            } catch (error) {
+                console.log("Redirect result error:", error);
+            }
+        }
+        handleRedirectResult();
+    }, [])
 
     const handleGoogleAuth = async () => {
         try {
+            // ✅ Use redirect for mobile, popup for desktop
+            const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                await signInWithRedirect(auth, provider);
+                return;
+            }
+
             const response = await signInWithPopup(auth, provider);
             const User = response.user;
             const name = User.displayName;
             const email = User.email;
             const result = await axios.post(serverUrl + "/api/auth/google", { name, email }, { withCredentials: true });
-            
+
             // ✅ Save token to localStorage so isAuth middleware can read it
-            if(result.data.token){
+            if (result.data.token) {
                 localStorage.setItem("token", result.data.token)
             }
-            
+
             // ✅ Save user data to Redux
             dispatch(setUserData(result.data.user))
 
@@ -95,16 +124,12 @@ function Auth() {
                     <Feature icon="📂" title="Projects" des="Well structured documentation for your projects." />
                     <Feature icon="📊" title="Charts & Graphs" des="Visualize concepts with AI-generated charts and graphs." />
                     <Feature icon="💾" title="Download PDF" des="Instantly download your notes as PDF." />
-
                 </div>
-
-
             </main>
-
-
         </div>
     )
 }
+
 function Feature({ icon, title, des }) {
     return (
         <motion.div
@@ -121,10 +146,8 @@ function Feature({ icon, title, des }) {
                 <h3 className='text-lg font-semibold mb-1'>{title}</h3>
                 <p className='text-gray-300 text-sm leading-relaxed'>{des}</p>
             </div>
-
         </motion.div>
     )
 }
-
 
 export default Auth;
