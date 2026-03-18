@@ -150,4 +150,8 @@ function Feature({ icon, title, des }) {
     )
 }
 
+<<<<<<< HEAD
 export default Auth;
+=======
+export default Auth;
+>>>>>>> 3b8c14cfbcbb34dd2b9f65979ca202be02ac8754
