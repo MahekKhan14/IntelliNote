@@ -20,44 +20,44 @@ function TopicForm({ setResult, setLoading, loading, setError }) {
     const dispatch = useDispatch(); // ✅ get Redux dispatch
 
     const handleSubmit = async () => {
-        if (!topic.trim()) {
-            setError("Please enter the topic");
-            return;
-        }
-        setError("");
-        setLoading(true);
-        setResult(null);
-
-        try {
-            const result = await generateNotes(
-                {
-                    topic,
-                    classLevel,
-                    examType,
-                    revisionMode,
-                    includeDiagram,
-                    includeChart})
-                    console.log("Generated Notes:", result)
-                    setResult(result.data)
-                    setLoading(false)
-                    setClassLevel("")
-                    setTopic("")
-                    setExamType("")
-                    setIncludeChart(false)
-                    setRevisionMode(false)
-                    setIncludeDiagram(false)
-
-                    if(typeof result.creditsLeft === "number"){
-                        dispatch(updateCredits(result.creditsLeft))
-                    }
-                    
-            
-            } catch (error) {
-            console.log(error);
-            setError("Failed to fetch notes from server");
-            setLoading(false);
-        }
+    if (!topic.trim()) {
+        setError("Please enter the topic");
+        return;
     }
+    setError("");
+    setLoading(true);
+    setResult(null);
+
+    try {
+        const result = await generateNotes({
+            topic,
+            classLevel,
+            examType,
+            revisionMode,
+            includeDiagram,
+            includeChart
+        });
+
+        console.log("Generated Notes:", result);
+        setResult(result);         // ✅ NOT result.data
+        setLoading(false);
+        setClassLevel("");
+        setTopic("");
+        setExamType("");
+        setIncludeChart(false);
+        setRevisionMode(false);
+        setIncludeDiagram(false);
+
+        if (typeof result.creditsLeft === "number") {
+            dispatch(updateCredits(result.creditsLeft));
+        }
+
+    } catch (error) {
+        console.log(error);
+        setError("Failed to fetch notes from server");
+        setLoading(false);
+    }
+}
 
     useEffect(() => {
         if (!loading) {
