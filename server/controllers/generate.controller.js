@@ -51,20 +51,7 @@ export const generateNotes = async (req, res) => {
                 message: "Gemini API fetch failed!"
             });
         }
-        // ✅ Gemini response parse karenge (removes ```json ``` wrappers)
-        let parsedResponse;
-        try {
-            const cleaned = aiResponse
-                .replace(/```json/g, "")
-                .replace(/```/g, "")
-                .trim();
-            parsedResponse = JSON.parse(cleaned);
-        } catch (parseError) {
-            return res.status(500).json({
-                error: "AI Generation failed",
-                message: "Failed to parse AI response"
-            });
-        }
+        // ✅ aiResponse is already parsed object from gemini.services.js
         // Ab notes create karenge aur DB me save karenge
         const notes = await Notes.create({
             user: user._id,
@@ -74,7 +61,7 @@ export const generateNotes = async (req, res) => {
             revisionMode,
             includeDiagram,
             includeChart,
-            content: JSON.stringify(parsedResponse) // ✅ parsed response save karenge
+            content: JSON.stringify(aiResponse) // ✅ stringify for DB storage
         });
         // User update karenge (credits minus + notes push)
         user.credits -= 10;
@@ -86,8 +73,8 @@ export const generateNotes = async (req, res) => {
         await user.save();
         // Final response bhejenge
         return res.status(200).json({
-            data: parsedResponse,   // ✅ parsed object bhejenge frontend ko
-            noteId: notes._id,      // Saved note ID
+            data: aiResponse,        // ✅ already parsed object, direct bhejenge
+            noteId: notes._id,       // Saved note ID
             creditsLeft: user.credits // Remaining credits
         });
     } catch (error) {
