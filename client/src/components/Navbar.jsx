@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { serverUrl } from '../App';
-import { setUserData } from '../redux/userSlice';
+import { setUserData, clearUserData } from '../redux/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -22,13 +22,13 @@ function Navbar() {
     try {
         await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
         localStorage.removeItem("token") // ✅ clear JWT token
-        dispatch(setUserData(null))
+        dispatch(clearUserData())
         navigate("/auth")
     } catch (error) {
         console.log(error)
         // ✅ Even if backend fails, still clear frontend state
         localStorage.removeItem("token")
-        dispatch(setUserData(null))
+        dispatch(clearUserData())
         navigate("/auth")
     }
 }
