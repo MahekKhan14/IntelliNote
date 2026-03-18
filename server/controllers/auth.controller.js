@@ -4,15 +4,12 @@ import { getToken } from "../utils/token.js";
 export const googleAuth = async (req, res) => {
     try {
         const { name, email } = req.body;
-
         let user = await UserModel.findOne({ email });
-
         if (!user) {
             user = await UserModel.create({ name, email });
         }
-
         let token = await getToken(user._id);
-
+        
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
@@ -21,13 +18,8 @@ export const googleAuth = async (req, res) => {
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
-
-        return res.status(200).json(user, token);
-
-        return res.status(200).json({
-    user,
-    token
-});
+        // ✅ Single return with both user and token
+        return res.status(200).json({ user, token });
 
     } catch (error) {
         return res.status(500).json({
@@ -46,12 +38,8 @@ export const logOut = async (req, res) => {
             sameSite: "None",
             path: "/"
         });
-
-        return res.status(200).json({
-            user,
-            token
-        });
-
+        // ✅ Fixed - removed undefined user and token variables
+        return res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
         return res.status(500).json({
             message: "Logout failed",
