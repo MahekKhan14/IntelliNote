@@ -130,11 +130,11 @@ function PricingCard({
     return (
         <motion.div onClick={() => setSelectedPrice(amount)}
             whileHover={{ y: -4 }} className={`relative cursor-pointer rounded-xl p-6 bg-white border transition
-        $(isSelected
-        ? "border-black"
-        : popular
-        ? "border-indigo-500"
-        : "border-gray-200"`}>
+       ${isSelected
+? "border-black"
+: popular
+? "border-indigo-500"
+: "border-gray-200"}`}>
             {popular && !isSelected && <span className='absolute top-4 right-4 text-xs px-2 py-1 rounded bg-indigo-600 text-white'>Popular</span>}
             {isSelected && <span className='absolute top-4 right-4 text-xs px-2 py-1 rounded bg-black text-white'>Selected</span>}
 
