@@ -79,9 +79,20 @@ export const generateNotes = async (req, res) => {
 });
     } catch (error) {
         console.log(error);
+        
+        let errorMessage = error.message;
+        try {
+            const parsedError = JSON.parse(error.message);
+            if (parsedError.error && parsedError.error.message) {
+                errorMessage = parsedError.error.message;
+            }
+        } catch (e) {
+            // Error is not JSON stringified, keep the original message
+        }
+
         res.status(500).json({
             error: "AI Generation failed",
-            message: error.message
+            message: errorMessage
         });
     }
 };
