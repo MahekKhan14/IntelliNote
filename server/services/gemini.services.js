@@ -1,17 +1,17 @@
-// Models to try in order of preference
-const models = [
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-];
+// We will use gemini-2.5-flash but add a retry mechanism since it gets overloaded often
+const Gemini_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Function to call Gemini API
 export const generateGeminiResponse = async (prompt) => {
   let lastError;
+  let retries = 3;
   
-  for (const url of models) {
+  for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(
-        `${url}?key=${process.env.GEMINI_API_KEY}`,
+        `${Gemini_URL}?key=${process.env.GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: {
@@ -34,7 +34,7 @@ export const generateGeminiResponse = async (prompt) => {
 
       const data = await response.json();
 
-      console.log(`Gemini raw response from ${url}:`, JSON.stringify(data, null, 2));
+      console.log(`Gemini raw response (Attempt ${i+1}):`, JSON.stringify(data, null, 2));
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
@@ -57,15 +57,18 @@ export const generateGeminiResponse = async (prompt) => {
       return parsed;
 
     } catch (error) {
-      console.log(`Gemini Fetch Error on ${url}:`, error.message);
+      console.log(`Gemini Fetch Error (Attempt ${i+1}):`, error.message);
       lastError = error;
       
-      // Attempt fallback if it fails
-      console.log("Attempting fallback model...");
-      continue;
+      // If we still have retries left, wait 2 seconds and try again
+      if (i < retries - 1) {
+          console.log(`Retrying in 2 seconds...`);
+          await delay(2000);
+          continue;
+      }
     }
   }
   
-  // If all models fail, throw the last error
+  // If all retries fail, throw the last error
   throw new Error(lastError.message);
 };
